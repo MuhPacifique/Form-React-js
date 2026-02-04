@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Register.css';
+import backgroundVideo from './video/mm.mp4';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -26,6 +27,11 @@ function Register() {
 
   return (
     <div className="register-container">
+      <video autoPlay loop muted playsInline className="video-background">
+        <source src={backgroundVideo} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <div className="content-overlay"></div>
       <form className="register-form" onSubmit={handleSubmit}>
         <h2>Register</h2>
         <div className="form-row">

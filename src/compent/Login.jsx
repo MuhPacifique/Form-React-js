@@ -1,19 +1,28 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Login.css';
+import backgroundVideo from './video/mm.mp4';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Email:', email);
     console.log('Password:', password);
+    // Navigate to dashboard after login
+    navigate('/dashboard');
   };
 
   return (
     <div className="login-container">
+      <video autoPlay loop muted playsInline className="video-background">
+        <source src={backgroundVideo} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <div className="content-overlay"></div>
       <form className="login-form" onSubmit={handleSubmit}>
         <h2>Login</h2>
         <div className="form-group">
