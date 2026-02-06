@@ -1,7 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './Dashboard.css';
 import backgroundVideo from './video/muhoza.mp4';
+
+function StatCounter({ end, duration = 2000 }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let startTime = null;
+    let animationFrame = null;
+
+    const animate = (currentTime) => {
+      if (!startTime) startTime = currentTime;
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+      setCount(Math.floor(progress * end));
+      
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      }
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [end, duration]);
+
+  return <span>{count}+</span>;
+}
 
 function Dashboard() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -45,6 +69,9 @@ function Dashboard() {
         <Link to="/dashboard" className="nav-item" onClick={toggleMenu}>
           <i className="fas fa-home"></i> Home
         </Link>
+        <Link to="/team" className="nav-item" onClick={toggleMenu}>
+          <i className="fas fa-users"></i> Team
+        </Link>
         <Link to="/about" className="nav-item" onClick={toggleMenu}>
           <i className="fas fa-info-circle"></i> About Us
         </Link>
@@ -82,6 +109,34 @@ function Dashboard() {
             <div className="card-content">
               <h3>AUT</h3>
               <p>Automobile Technology: Explore automotive engineering, diagnostics, and maintenance.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="extra-content" style={{ marginTop: '4rem', textAlign: 'left' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+            <div className="info-block" style={{ background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '15px', backdropFilter: 'blur(10px)' }}>
+              <h2 style={{ color: '#10b981' }}><i className="fas fa-bullseye"></i> Our Goal</h2>
+              <p>To be the leading technical institution providing hands-on skills that bridge the gap between education and industry requirements.</p>
+            </div>
+            <div className="info-block" style={{ background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '15px', backdropFilter: 'blur(10px)' }}>
+              <h2 style={{ color: '#10b981' }}><i className="fas fa-chart-line"></i> Recent Success</h2>
+              <p>Over 95% of our graduates from the last cohort secured employment within three months of completion.</p>
+            </div>
+          </div>
+
+          <div className="stats-section" style={{ marginTop: '3rem', display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '2rem', padding: '2rem', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '15px' }}>
+            <div className="stat-item" style={{ textAlign: 'center' }}>
+              <h2 style={{ fontSize: '2.5rem', margin: '0' }}><StatCounter end={500} /></h2>
+              <p>Active Students</p>
+            </div>
+            <div className="stat-item" style={{ textAlign: 'center' }}>
+              <h2 style={{ fontSize: '2.5rem', margin: '0' }}><StatCounter end={50} /></h2>
+              <p>Expert Instructors</p>
+            </div>
+            <div className="stat-item" style={{ textAlign: 'center' }}>
+              <h2 style={{ fontSize: '2.5rem', margin: '0' }}><StatCounter end={15} /></h2>
+              <p>Industry Partners</p>
             </div>
           </div>
         </section>
