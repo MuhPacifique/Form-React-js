@@ -1,8 +1,17 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 
 function About() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (!user) {
+      navigate('/');
+    }
+  }, [navigate]);
+
   return (
     <div className="dashboard-container">
       <header className="header">

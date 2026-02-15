@@ -29,19 +29,107 @@ function StatCounter({ end, duration = 2000 }) {
 
 function Dashboard() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [editingUser, setEditingUser] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: ''
+  });
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (!user) {
+      navigate('/');
+    } else {
+      fetchUsers();
+    }
+  }, [navigate]);
+
+  const fetchUsers = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('http://127.0.0.1:5001/users');
+      if (!response.ok) {
+        throw new Error('Failed to fetch users');
+      }
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setError('Could not connect to the database. Please ensure the server is running.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async (id) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      try {
+        const response = await fetch(`http://127.0.0.1:5001/users/${id}`, {
+          method: 'DELETE',
+        });
+        if (response.ok) {
+          fetchUsers();
+        }
+      } catch (error) {
+        console.error('Error deleting user:', error);
+      }
+    }
+  };
+
+  const handleEditClick = (user) => {
+    setEditingUser(user.id);
+    setEditFormData({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone
+    });
+  };
+
+  const handleEditChange = (e) => {
+    setEditFormData({
+      ...editFormData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleUpdateUser = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`http://127.0.0.1:5001/users/${editingUser}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editFormData),
+      });
+      if (response.ok) {
+        setEditingUser(null);
+        fetchUsers();
+      }
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   const handleLogout = () => {
-    // Logic for logout can be added here
+    localStorage.removeItem('user');
     navigate('/');
   };
 
   return (
-    <div className="dashboard-container">
+    <div className={`dashboard-container ${isMenuOpen ? 'menu-open' : ''}`}>
       <video autoPlay loop muted playsInline className="video-background">
         <source src={backgroundVideo} type="video/mp4" />
         Your browser does not support the video tag.
@@ -58,17 +146,29 @@ function Dashboard() {
         </button>
       </header>
 
-      {/* Overlay for closing menu when clicking outside */}
-      <div 
-        className={`overlay ${isMenuOpen ? 'visible' : ''}`} 
-        onClick={toggleMenu}
-      ></div>
-
       {/* Navigation Sidebar */}
       <nav className={`nav-menu ${isMenuOpen ? 'open' : ''}`}>
         <Link to="/dashboard" className="nav-item" onClick={toggleMenu}>
           <i className="fas fa-home"></i> Home
         </Link>
+        <a href="#user-management" className="nav-item" onClick={toggleMenu}>
+          <i className="fas fa-user-shield"></i> Users
+        </a>
+        <div className="nav-users-list">
+          {isLoading ? (
+            <div className="nav-user-item">Loading...</div>
+          ) : error ? (
+            <div className="nav-user-item" style={{ color: '#ef4444' }}>Error loading users</div>
+          ) : users.length === 0 ? (
+            <div className="nav-user-item">No users yet</div>
+          ) : (
+            users.map(user => (
+              <div key={user.id} className="nav-user-item">
+                <i className="fas fa-user-circle"></i> {user.firstName} {user.lastName}
+              </div>
+            ))
+          )}
+        </div>
         <Link to="/team" className="nav-item" onClick={toggleMenu}>
           <i className="fas fa-users"></i> Team
         </Link>
@@ -110,6 +210,66 @@ function Dashboard() {
               <h3>AUT</h3>
               <p>Automobile Technology: Explore automotive engineering, diagnostics, and maintenance.</p>
             </div>
+          </div>
+        </section>
+
+        <section id="user-management" className="user-management-section">
+          <h2>User Management</h2>
+          <div className="table-container">
+            <table className="user-table">
+              <thead>
+                <tr>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {isLoading ? (
+                  <tr>
+                    <td colSpan="5" style={{ textAlign: 'center' }}>Loading users from database...</td>
+                  </tr>
+                ) : error ? (
+                  <tr>
+                    <td colSpan="5" style={{ textAlign: 'center', color: '#ef4444' }}>{error}</td>
+                  </tr>
+                ) : users.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" style={{ textAlign: 'center' }}>No users found in database.</td>
+                  </tr>
+                ) : (
+                  users.map((user) => (
+                    <tr key={user.id}>
+                      {editingUser === user.id ? (
+                        <>
+                          <td><input type="text" name="firstName" value={editFormData.firstName} onChange={handleEditChange} /></td>
+                          <td><input type="text" name="lastName" value={editFormData.lastName} onChange={handleEditChange} /></td>
+                          <td><input type="email" name="email" value={editFormData.email} onChange={handleEditChange} /></td>
+                          <td><input type="text" name="phone" value={editFormData.phone} onChange={handleEditChange} /></td>
+                          <td>
+                            <button className="save-btn" onClick={handleUpdateUser}>Save</button>
+                            <button className="cancel-btn" onClick={() => setEditingUser(null)}>Cancel</button>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td>{user.firstName}</td>
+                          <td>{user.lastName}</td>
+                          <td>{user.email}</td>
+                          <td>{user.phone}</td>
+                          <td>
+                            <button className="edit-btn" onClick={() => handleEditClick(user)}>Edit</button>
+                            <button className="delete-btn" onClick={() => handleDeleteUser(user.id)}>Delete</button>
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </section>
 

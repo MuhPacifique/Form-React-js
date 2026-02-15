@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Register.css';
 import backgroundVideo from './video/mm.mp4';
 
@@ -11,6 +11,7 @@ function Register() {
     password: '',
     phone: ''
   });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,9 +21,32 @@ function Register() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Registration Data:', formData);
+    console.log('Registering with:', formData);
+    try {
+      const response = await fetch('http://127.0.0.1:5001/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      console.log('Response status:', response.status);
+      const data = await response.json();
+      console.log('Response data:', data);
+
+      if (response.ok) {
+        alert(data.message);
+        navigate('/');
+      } else {
+        alert(data.message || 'Registration failed');
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      alert('Cannot connect to server. Please make sure the backend is running.');
+    }
   };
 
   return (

@@ -4,6 +4,15 @@
   overflow-x: hidden;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding-top: 70px; /* Offset for fixed header */
+  transition: padding-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dashboard-container.menu-open {
+  padding-left: 250px;
+}
+
+.welcome-content, .footer {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .video-background {
@@ -40,6 +49,11 @@
   z-index: 1000;
   backdrop-filter: blur(10px);
   animation: slideDown 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu-open .header {
+  left: 250px;
 }
 
 .menu-icon {
@@ -137,6 +151,48 @@
   color: #10b981;
   border-left-color: #10b981;
   padding-left: 2.5rem;
+}
+
+.nav-users-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-users-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.nav-users-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-users-list::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 10px;
+}
+
+.nav-user-item {
+  padding: 0.6rem 1rem;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  transition: all 0.3s ease;
+  cursor: default;
+}
+
+.nav-user-item i {
+  color: #10b981;
+  font-size: 1rem;
+}
+
+.nav-user-item:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .logout-btn {
@@ -339,4 +395,102 @@
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   color: #94a3b8;
   font-size: 0.9rem;
+}
+
+/* User Management Section */
+.user-management-section {
+  margin-top: 4rem;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: fadeInUp 0.8s ease-out both;
+}
+
+.user-management-section h2 {
+  color: #10b981;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: white;
+  text-align: left;
+}
+
+.user-table th, .user-table td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-table th {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  font-weight: 600;
+}
+
+.user-table tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.user-table input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.edit-btn, .delete-btn, .save-btn, .cancel-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  font-weight: 500;
+  margin-right: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.edit-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.edit-btn:hover {
+  background: #2563eb;
+}
+
+.delete-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}
+
+.save-btn {
+  background: #10b981;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #059669;
+}
+
+.cancel-btn {
+  background: #6b7280;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: #4b5563;
 }

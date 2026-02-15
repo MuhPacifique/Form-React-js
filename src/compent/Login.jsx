@@ -8,12 +8,29 @@ function Login() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Email:', email);
-    console.log('Password:', password);
-    // Navigate to dashboard after login
-    navigate('/dashboard');
+    try {
+      const response = await fetch('http://127.0.0.1:5001/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await response.json();
+      if (response.ok) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        alert(data.message);
+        navigate('/dashboard');
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      alert('An error occurred during login');
+    }
   };
 
   return (
